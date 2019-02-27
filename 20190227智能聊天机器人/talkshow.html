@@ -1,0 +1,201 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>智能聊天机器人</title>
+    <link rel="icon" href="images/jimi.png">
+    <meta charset="utf-8">
+    <style type="text/css">
+        body{
+            background: url("images/3.jpg") no-repeat;
+            background-size: cover;
+
+        }
+        .talkBox {
+            width: 700px;
+            height: 620px;
+            background-color: white;
+            margin: 60px auto;
+            border-radius: 5px;
+            box-shadow: 0px 0px 5px #000000;
+            display:  none;
+        }
+        .header {
+            height: 80px;
+            background-color: #0066ff;
+            border-radius: 5px;
+            position: relative;
+        }
+        .header .logo {
+            width: 400px;
+            height: 90px;
+            position: absolute;
+            bottom: 65px;
+        }
+        .header .hide {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            border: 1px solid #fff;
+            text-align: center;
+            font-size: 35px;
+            line-height: 50px;
+            color: white;
+            margin: 15px;
+            cursor: pointer;
+        }
+        .header .hide:hover {
+            width: 60px;
+            height: 60px;
+            font-size: 38px;
+            line-height: 60px;
+        }
+        .center {
+            width: 680px;
+            height: 400px;
+            background: white;
+            padding: 10px;
+            overflow: auto;
+        }
+        .bottom {
+            height: 120px;
+        }
+        .bottom #sendContent {
+            height: 70px;
+            width: 680px;
+            border: none;
+            border-top: 1px solid #ddd;
+            outline: medium;
+        }
+        .bottom .footer {
+            height: 40px;
+            cursor: pointer;
+        }
+        .footer span {
+            margin-left: 10px;
+            text-decoration: underline;
+            font: 14px/40px 微软雅黑;
+        }
+        .footer button {
+            float: right;
+            margin-right: 20px;
+            width: 100px;
+            height: 36px;
+            font-size: 18px;
+            background-color: #0066ff;
+            border-radius: 5px;
+            border: none;
+            color: #fff;
+            cursor: pointer;
+            box-shadow: 0px 0px 5px #000;
+        }
+        .footer button:hover {
+            box-shadow: 0px 0px 8px 2px #000;
+        }
+        .center .robot{
+            width: 100%;
+            color: #ff6600;
+        }
+        .center .person {
+            float: right;
+            text-align: right;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+    <a href="javascript:void(0)" class="showBox">在线智能机器人</a>
+
+
+    <!-- 聊天框 start -->
+    <div class="talkBox">
+        <!-- 聊天框头部 start -->
+        <div class="header">
+            <div class="logo"><img src="images/jimi.png" style="width: 160px; height: 160px;"></div>
+            <div class="hide" style="float: right">X</div>
+        </div>
+        <!-- 聊天框头部 end -->
+
+        <!-- 聊天框中部 start -->
+        <div class="center">
+            <div class="robot">
+                <img src="images/jimi.png" width="50" height="50">
+                <span class="msgGet">您好,我是小J，有什么可以帮到您的吗？</span>
+            </div>
+            <div class="person">
+                <!--<span class="msgSend">你好</span>-->
+                <!--<img src="images/logo.jpg" width="50" height="50" style="border-radius: 50%">-->
+            </div>
+        </div>
+        <!-- 聊天框中部 end -->
+
+        <!-- 聊天框底部 start -->
+        <div class="bottom">
+            <input type="text" id="sendContent" placeholder="请输入您的问题~"/>
+            <div class="footer">
+                <span>满意度调查</span>
+                <span>教我说说话吧</span>
+                <button id="sendBtn">发送</button>
+            </div>
+        </div>
+        <!-- 聊天框底部 end -->
+    </div>
+    <!-- 聊天框 end -->
+
+<!-- 引入Jquery的官方类库 -->
+<script type="text/javascript" src="js/jquery-3.3.1.min.js">
+</script>
+<script type="text/javascript">
+    <!--通用起手-->
+    $(function () {
+        $(".showBox").click(function () {
+            $(".talkBox").toggle("fast");
+        });
+        $(".hide").click(function () {
+            $(".talkBox").toggle("fast");
+        });
+        $("#sendBtn").click(function () {
+            var content = $("#sendContent").val();
+
+            var html = "<div class=\"person\">\n" +
+                "<span class=\"msgSend\">"+ content+"</span>\n" +
+                "<img src=\"images/logo.jpg\" width=\"50\" height=\"50\" style=\"border-radius: 50%\">\n" +
+                "</div>";
+            var center = $(".center");
+            center.append(html);
+
+            center.scrollTop(center[0].scrollHeight);
+
+            $.ajax({
+                type:"get",
+                url:"http://www.tuling123.com/openapi/api?key=32db1efb17b34922bb0acc852e83cc5f&info="+content,
+                success:function (res) {
+                    var obj = res;
+                    var temp = "<span>"+obj.text+"</span>";
+                    if(obj.url) {
+                        temp += "<a href='"+obj.url+"' target=_blank>"+obj.text+"</a>";
+                    }
+                    html = "<div class=\"robot\">\n" +
+                        "                <img src=\"images/jimi.png\" width=\"50\" height=\"50\">\n" +
+                        "                <span class=\"msgGet\">"+temp+"</span>\n" +
+                        "            </div>";
+                    center.append(html);
+                    center.scrollTop(center[0].scrollHeight);
+                    $("#sendContent").val("");
+                },
+                error:function (res) {
+                    console.log(res.msg)
+                }
+            });
+
+        });
+        window.onkeydown = function (event) {
+            var key = event.keyCode;
+            if(key==13) {
+                $("#sendBtn").click();
+            }
+        }
+
+    });
+</script>
+</body>
+</html>
